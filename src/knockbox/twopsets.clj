@@ -19,10 +19,8 @@
 
 (defn remove [s item]
     "Remove an item from a set"
-    (println (s :adds))
-    (if ((s :adds) item) 
-        (assoc s :dels
-            (conj (s :dels) item))))
+    (assoc s :dels
+        (conj (s :dels) item)))
 
 (defn merge [a b]
     "Merge two sets together"
