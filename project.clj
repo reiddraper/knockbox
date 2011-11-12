@@ -1,4 +1,4 @@
-(defproject knockbox "1.0.0-SNAPSHOT"
-  :description "FIXME: write description"
+(defproject knockbox "0.0.1-SNAPSHOT"
+  :description "An eventually-consistent toolbox for Clojure, and eventually the JVM in general."
   :dependencies [[org.clojure/clojure "1.2.1"]]
   :dev-dependencies [[lein-marginalia "0.6.0"]])
