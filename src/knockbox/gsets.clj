@@ -1,5 +1,6 @@
 (ns knockbox.gsets
-    "This is an implementation of the grow-only
+    "This is an implementation of a
+    state-based grow-only
     set data type. Operations are limited
     to set-addition, and the merge algorithm
     is simply the union of the two sets.")

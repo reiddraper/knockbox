@@ -1,5 +1,6 @@
 (ns knockbox.twopsets
     "This is an implementation of a
+    state-based
     Two-Phase set data type.
     This data type allows deletes,
     with the limitation that items
