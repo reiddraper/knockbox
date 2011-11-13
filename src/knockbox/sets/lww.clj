@@ -61,3 +61,10 @@
   the set"
   [s]
   (keys (minus-deletes s)))
+
+(defn merge
+  "Merge two sets together"
+  [a b]
+  (let [adds (hash-max (a :adds) (b :adds))
+        dels (hash-max (a :dels) (b :dels))]
+    (struct-map kblwwset :adds adds :dels dels)))
