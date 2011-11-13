@@ -7,7 +7,9 @@
     can only be deleted that are in
     the set (the local replica) and
     that items can not be added back
-    once they've been deleted.")
+    once they've been deleted. The merge
+    function simply takes the set union
+    of each replica's `adds` and `deletes`.")
 
 (defstruct kb2pset :adds :dels)
 
@@ -28,7 +30,8 @@
         (conj (:adds s) item)))
 
 (defn remove
-    "Remove an item from a set"
+    "Remove an `item` from the set `s`.
+    `item` must already be in the set."
     [s item]
     (assoc s :dels
         (conj (s :dels) item)))
