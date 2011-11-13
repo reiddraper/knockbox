@@ -1,4 +1,4 @@
-(ns knockbox.gsets
+(ns knockbox.sets.gsets
     "This is an implementation of a
     state-based grow-only
     set data type. Operations are limited
@@ -10,7 +10,7 @@
     optionally accepting a starting
     set"
     [& args]
-    (or args #{}))
+    (or (first args) #{}))
 
 (defn add
     "Add an item to a set"
@@ -21,3 +21,14 @@
     "Merge two sets together"
     [a b]
     (clojure.set/union a b))
+
+(defn items
+    "Return all of the items in the set"
+    [s]
+    (seq s))
+
+(defn exists?
+    "Check for the existence of
+    a particular item in the set"
+    [s item]
+        (boolean (s item)))

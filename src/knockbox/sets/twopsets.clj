@@ -1,4 +1,4 @@
-(ns knockbox.twopsets
+(ns knockbox.sets.twopsets
     "This is an implementation of a
     state-based
     Two-Phase set data type.
@@ -47,14 +47,16 @@
 
 (defn exists?
     "Check for the existence
-    if a particular item in the
+    of a particular item in the
     set"
     [s item]
-    (and ((s :adds) item) ((s :dels) item)))
+    (boolean 
+      (and ((s :adds) item) (not ((s :dels) item)))))
 
 (defn items
     "Return all of the items in
     the set that haven't been
     deleted"
     [s]
-    (clojure.set/difference (s :adds) (s :dels)))
+    (seq
+      (clojure.set/difference (s :adds) (s :dels))))
