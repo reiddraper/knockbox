@@ -46,17 +46,17 @@
     (struct-map kb2pset :adds adds :dels dels)))
 
 (defn exists?
-    "Check for the existence
-    of a particular item in the
-    set"
-    [s item]
-    (boolean 
-      (and ((s :adds) item) (not ((s :dels) item)))))
+  "Check for the existence
+  of a particular item in the
+  set"
+  [s item]
+  (boolean 
+    (and ((s :adds) item) (not ((s :dels) item)))))
 
 (defn items
-    "Return all of the items in
-    the set that haven't been
-    deleted"
-    [s]
-    (seq
-      (clojure.set/difference (s :adds) (s :dels))))
+  "Return all of the items in
+  the set that haven't been
+  deleted"
+  [s]
+  (seq
+    (clojure.set/difference (s :adds) (s :dels))))
