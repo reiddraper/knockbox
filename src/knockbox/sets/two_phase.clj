@@ -1,4 +1,4 @@
-(ns knockbox.sets.twopsets
+(ns knockbox.sets.two-phase
   "This is an implementation of a
   state-based
   Two-Phase set data type.

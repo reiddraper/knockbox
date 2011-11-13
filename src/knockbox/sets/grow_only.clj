@@ -1,4 +1,4 @@
-(ns knockbox.sets.gsets
+(ns knockbox.sets.grow-only
   "This is an implementation of a
   state-based grow-only
   set data type. Operations are limited
