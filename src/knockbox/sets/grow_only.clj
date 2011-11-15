@@ -24,17 +24,13 @@
   to set-addition, and the merge algorithm
   is simply the union of the two sets.")
 
-(defn gset
+(deftype Gset
   "Create a new grow-only set,
   optionally accepting a starting
   set"
-  [& args]
-  (or (first args) #{}))
+  [items]
 
-(defn add
-  "Add an item to a set"
-  [s item]
-  (conj s item))
+  (add [items item] (.Gset (conj items item)))
 
 (defn merge
   "Merge two sets together"
