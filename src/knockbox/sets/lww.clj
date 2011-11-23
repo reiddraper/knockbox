@@ -21,9 +21,26 @@
   "This is an implementation of
   a state-based last-write-wins set.
   `add` and `remove` operations have associated
-  timestamps that are used to resolve conflicts")
+  timestamps that are used to resolve conflicts"
 
-(defstruct kblwwset :adds :dels)
+  (:use [ordered.common :only [Compactable compact change!]])
+  (:import (clojure.lang IPersistentSet ITransientSet IEditableCollection
+                         IPersistentMap ITransientMap ITransientAssociative
+                         IPersistentVector ITransientVector
+                         Associative SeqIterator Reversible IFn IObj)
+           (java.util Set Collection)))
+
+(defn- minus-deletes
+  "Remove deletes with
+  earlier timestamps
+  than adds"
+  [adds dels]
+  (let [favor-deletes (fn [add delete] (if (>= delete add) nil add))
+        no-deletes (merge-with favor-deletes
+                        adds
+                        (select-keys dels (keys adds))))
+        no-nil (fn [a] (not= (get a 1) nil))]
+    (into {} (filter no-nil no-deletes))))
 
 (defn- hash-max
   "Merge two hashes, taking the
@@ -32,41 +49,37 @@
   (let [f (fn [a b] (max a b))]
     (merge-with f a b)))
 
-(defn- minus-deletes
-  "Remove deletes with
-  earlier timestamps
-  than adds"
-  [s]
-  (let [favor-deletes (fn [add delete] (if (>= delete add) nil add))
-        no-deletes (merge-with favor-deletes
-                        (s :adds)
-                        (select-keys (s :dels) (keys (s :adds))))
-        no-nil (fn [a] (not= (get a 1) nil))]
-    (into {} (filter no-nil no-deletes))))
- 
-(defn lwwset
-  "Create a new lww set,
-  optionally accepting
-  a starting set"
-  [& args]
-  (let [initial (or (first args) (hash-map))]
-    (struct-map kblwwset
-                :adds initial
-                :dels (hash-map))))
+(deftype LWW [^IPersistentMap adds
+              ^IPersistentMap dels]
 
-(defn add
-  "Add an item to a set"
-  [s item]
-  (let [now (System/nanoTime)]
-    (assoc s :adds
-      (assoc (s :adds) item now))))
+  IPersistentSet 
+  (disjoin [this key]
+    (let [now (System/nanoTime)]
+      (LWW. adds
+        (assoc dels item now))))
 
-(defn remove
-  "Remove an item from a set"
-  [s item]
-  (let [now (System/nanoTime)]
-    (assoc s :dels
-      (assoc (s :dels) item now))))
+  (cons [this k]
+    (let [now (System/nanoTime)]
+      (LWW.
+        (assoc adds item now)
+        dels)))
+
+  (seq [this]
+    (keys (minus-deletes adds dels)))
+
+  (empty [this]
+    (LWW. {} {}))
+
+  (equiv [this other]
+    (.equals this other))
+
+  (get [this k]
+    (if (> (get adds k) (get dels k)
+      k
+      nil)))
+
+  (count [this]
+    (count (seq this)))
 
 (defn exists?
   "Check for the existence
@@ -74,12 +87,6 @@
   [s item]
   (boolean ((minus-deletes s) item)))
 
-(defn items
-  "Return all of the items 
-  that haven't been deleted in
-  the set"
-  [s]
-  (keys (minus-deletes s)))
 
 (defn merge
   "Merge two sets together"
