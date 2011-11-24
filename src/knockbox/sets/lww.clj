@@ -24,8 +24,8 @@
   timestamps that are used to resolve conflicts"
 
   (:import (clojure.lang IPersistentSet IPersistentMap
-                         IFn IObj)
-           (java.util Set Collection)))
+                         IFn IObj RT)
+           (java.util Set)))
 
 (defn- minus-deletes
   "Remove deletes with
@@ -107,6 +107,9 @@
 
   (isEmpty [this]
     (= 0 (count this)))
+
+  (toArray [this]
+    (RT/seqToArray (seq this)))
 
   (toArray [this dest]
     (reduce (fn [idx item]
