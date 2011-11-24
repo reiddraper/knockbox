@@ -37,7 +37,8 @@
                         adds
                         (select-keys dels (keys adds)))
         no-nil (fn [a] (not= (get a 1) nil))]
-    (filter no-nil no-deletes)))
+    (map #(get % 0)
+      (filter no-nil no-deletes))))
 
 (deftype LWW [^IPersistentMap adds
               ^IPersistentMap dels]
@@ -64,6 +65,10 @@
     (if (> (get adds k) (get dels k))
       k
       nil))
+
+  (seq [this]
+    (keys 
+      (minus-deletes adds dels)))
 
   (count [this]
     (count (seq this)))
@@ -108,10 +113,6 @@
               (aset dest idx item)
               (inc idx))
             0, (seq this))
-    dest)
-    
-  clojure.lang.Seqable
-  (seq [this]
-    (minus-deletes adds dels)))
+    dest))
 
 (defn lww [] (LWW. {} {}))
