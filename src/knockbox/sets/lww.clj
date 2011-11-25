@@ -67,8 +67,7 @@
       nil))
 
   (seq [this]
-    (keys 
-      (minus-deletes adds dels)))
+    (minus-deletes adds dels))
 
   (count [this]
     (count (seq this)))
