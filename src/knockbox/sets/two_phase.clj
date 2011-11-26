@@ -28,54 +28,95 @@
   that items can not be added back
   once they've been deleted. The merge
   function simply takes the set union
-  of each replica's `adds` and `deletes`.")
+  of each replica's `adds` and `deletes`."
 
-(defstruct kb2pset :adds :dels)
+  (:require [clojure.set])
+  (:import (clojure.lang IPersistentSet IPersistentMap
+                         IFn IObj RT)
+           (java.util Set)))
 
-(defn twopset
-  "Create a new 2p-set,
-  optionally accepting a starting
-  set"
-  [& args]
-  (let [initial (or (first args) #{})]
-    (struct-map kb2pset
-                :adds initial
-                :dels #{})))
+(defn minus-deletes [adds dels]
+  (clojure.set/difference
+    adds
+    dels))
 
-(defn add
-  "Add an item to a set"
-  [s item]
-  (assoc s :adds
-    (conj (:adds s) item)))
+(deftype TwoPhaseSet [^IPersistentSet adds
+                      ^IPersistentSet dels]
 
-(defn remove
-  "Remove an `item` from the set `s`.
-  `item` must already be in the set."
-  [s item]
-  (assoc s :dels
-    (conj (s :dels) item)))
+  IPersistentSet 
+  (disjoin [this k]
+    (if (contains? adds k)
+      (TwoPhaseSet. adds (conj dels k))
+      ;; TODO:
+      ;; should this return nil or this?
+      this))
 
-(defn merge
-  "Merge two sets together"
-  [a b]
-  (let [adds (clojure.set/union
-                (a :adds) (b :adds))
-        dels (clojure.set/union
-                (a :dels) (b :dels))]
-    (struct-map kb2pset :adds adds :dels dels)))
+  (cons [this k]
+    (TwoPhaseSet.
+      (conj adds k)
+      dels))
 
-(defn exists?
-  "Check for the existence
-  of a particular item in the
-  set"
-  [s item]
-  (boolean 
-    (and ((s :adds) item) (not ((s :dels) item)))))
+  (empty [this]
+    (TwoPhaseSet. #{} #{}))
 
-(defn items
-  "Return all of the items in
-  the set that haven't been
-  deleted"
-  [s]
-  (seq
-    (clojure.set/difference (s :adds) (s :dels))))
+  (equiv [this other]
+    (.equals this other))
+
+  (get [this k]
+    (if (get dels k)
+      nil
+      (get adds k)))
+
+  (seq [this]
+    (seq
+      (minus-deletes adds dels)))
+
+  (count [this]
+    (count (seq this)))
+
+  IObj
+  (meta [this]
+    (.meta ^IObj adds))
+
+  (withMeta [this m]
+    (TwoPhaseSet. (.withMeta ^IObj adds m)
+          dels))
+
+  Object
+  (hashCode [this]
+    (hash (minus-deletes adds dels)))
+
+  (equals [this other]
+    (or (identical? this other)
+        (and (instance? Set other)
+             (let [^Set o (cast Set other)]
+               (and (= (count this) (count o))
+                    (every? #(contains? % o) (seq this)))))))
+
+  (toString [this]
+    (.toString (minus-deletes adds dels)))
+
+  Set
+  (contains [this k]
+    (boolean (get this k)))
+
+  (containsAll [this ks]
+    (every? identity (map #(contains? this %) ks)))
+
+  (size [this]
+    (count this))
+
+  (isEmpty [this]
+    (= 0 (count this)))
+
+  (toArray [this]
+    (RT/seqToArray (seq this)))
+
+  (toArray [this dest]
+    (reduce (fn [idx item]
+              (aset dest idx item)
+              (inc idx))
+            0, (seq this))
+    dest))
+
+(defn twopset [] (TwoPhaseSet. #{} #{}))
