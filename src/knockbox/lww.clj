@@ -17,17 +17,9 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(ns knockbox.sets.lww
-  "This is an implementation of
-  a state-based last-write-wins set.
-  `add` and `remove` operations have associated
-  timestamps that are used to resolve conflicts"
+(in-ns 'knockbox.set)
 
-  (:import (clojure.lang IPersistentSet IPersistentMap
-                         IFn IObj RT)
-           (java.util Set)))
-
-(defn- minus-deletes
+(defn- lww-minus-deletes
   "Remove deletes with
   earlier timestamps
   than adds"
@@ -67,7 +59,7 @@
       nil))
 
   (seq [this]
-    (minus-deletes adds dels))
+    (seq (lww-minus-deletes adds dels)))
 
   (count [this]
     (count (seq this)))

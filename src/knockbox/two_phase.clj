@@ -17,25 +17,9 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(ns knockbox.sets.two-phase
-  "This is an implementation of a
-  state-based
-  Two-Phase set data type.
-  This data type allows deletes,
-  with the limitation that items
-  can only be deleted that are in
-  the set (the local replica) and
-  that items can not be added back
-  once they've been deleted. The merge
-  function simply takes the set union
-  of each replica's `adds` and `deletes`."
+(in-ns 'knockbox.set)
 
-  (:require [clojure.set])
-  (:import (clojure.lang IPersistentSet IPersistentMap
-                         IFn IObj RT)
-           (java.util Set)))
-
-(defn minus-deletes [adds dels]
+(defn twop-minus-deletes [adds dels]
   (clojure.set/difference
     adds
     dels))
@@ -69,7 +53,7 @@
 
   (seq [this]
     (seq
-      (minus-deletes adds dels)))
+      (twop-minus-deletes adds dels)))
 
   (count [this]
     (count (seq this)))
@@ -84,7 +68,7 @@
 
   Object
   (hashCode [this]
-    (hash (minus-deletes adds dels)))
+    (hash (twop-minus-deletes adds dels)))
 
   (equals [this other]
     (or (identical? this other)
@@ -94,7 +78,7 @@
                     (every? #(contains? % o) (seq this)))))))
 
   (toString [this]
-    (.toString (minus-deletes adds dels)))
+    (.toString (twop-minus-deletes adds dels)))
 
   Set
   (contains [this k]
