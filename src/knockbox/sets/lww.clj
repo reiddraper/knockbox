@@ -92,7 +92,7 @@
                     (every? #(contains? % o) (seq this)))))))
 
   (toString [this]
-    "an string")
+    (.toString (set (seq this))))
 
   Set
   (contains [this k]
