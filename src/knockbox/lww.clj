@@ -107,6 +107,9 @@
               (aset dest idx item)
               (inc idx))
             0, (seq this))
-    dest))
+    dest)
+
+  Serializable
+  )
 
 (defn lww [] (LWW. {} {}))
