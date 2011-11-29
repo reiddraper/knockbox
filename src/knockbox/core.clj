@@ -22,4 +22,4 @@
 
 (defprotocol Resolvable
     "docstring"
-    (resolve [a & more]))
+    (resolve [a b]))
