@@ -109,7 +109,15 @@
             0, (seq this))
     dest)
 
+  ;; this is just here to mark
+  ;; the object as serializable
   Serializable
-  )
+
+  Resolvable 
+  (resolve [this other]
+    ;; TODO:
+    ;; remove this hack,
+    ;; here just to test
+    this))
 
 (defn lww [] (LWW. {} {}))

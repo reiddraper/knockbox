@@ -17,14 +17,10 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(ns knockbox.set
-  (:require [clojure.set])
-  (:import (clojure.lang IPersistentSet IPersistentMap
-                         IFn IObj RT)
-           (java.util Set)
-           (java.io Serializable))
-  (:refer-clojure :exclude [resolve])
-  (:use [knockbox.resolvable]))
+(ns knockbox.resolvable
+  (:refer-clojure :exclude [resolve]))
 
-(load "lww")
-(load "two_phase")
+(defprotocol Resolvable
+    "Represents a type that can be treated
+    as a CRDT (commutative replicated data type)."
+    (resolve [a b]))

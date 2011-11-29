@@ -18,8 +18,8 @@
 ;; -------------------------------------------------------------------
 
 (ns knockbox.core
-  (:refer-clojure :exclude [resolve]))
+  (:refer-clojure :exclude [resolve])
+  (:require [knockbox.resolvable]))
 
-(defprotocol Resolvable
-    "docstring"
-    (resolve [a b]))
+(defn resolve [coll]
+  (reduce knockbox.resolvable/resolve coll)) 
