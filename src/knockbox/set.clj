@@ -28,3 +28,4 @@
 
 (load "lww")
 (load "two_phase")
+(load "or")
