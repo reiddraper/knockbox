@@ -109,9 +109,8 @@
 
   Resolvable 
   (resolve [this other]
-    ;; TODO:
-    ;; remove this hack,
-    ;; here just to test
-    this))
+    (let [new-adds (clojure.set/union adds (.adds other))
+          new-dels (clojure.set/union dels (.dels other))]
+      (TwoPhaseSet. new-adds new-dels))))
 
-(defn twopset [] (TwoPhaseSet. #{} #{}))
+(defn two-phase [] (TwoPhaseSet. #{} #{}))

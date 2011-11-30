@@ -122,9 +122,9 @@
 
   Resolvable 
   (resolve [this other]
-    (let [adds (hash-max adds (.adds other))
-          dels (hash-max dels (.dels other))]
-      (LWW. adds dels))))
+    (let [new-adds (hash-max adds (.adds other))
+          new-dels (hash-max dels (.dels other))]
+      (LWW. new-adds new-dels))))
 
 
 (defn lww [] (LWW. {} {}))
