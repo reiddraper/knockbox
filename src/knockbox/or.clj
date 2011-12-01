@@ -1,4 +1,4 @@
-;; -------------------------------------------------------------------
+; -------------------------------------------------------------------
 ;; Copyright (c) 2011 Basho Technologies, Inc.  All Rights Reserved.
 ;;
 ;; This file is provided to you under the Apache License,
@@ -41,7 +41,7 @@
       (ObservedRemoveSet. new-adds-set new-dels-set)))
 
   (cons [this k]
-    (let [id (uuid)]
+    (let [id (uuid)
           new-adds-value (clojure.set/union #{id} (gets adds k))]
       (ObservedRemoveSet. new-adds-value dels)))
 
@@ -55,7 +55,7 @@
     (let [add-value (gets adds k)
           del-value (gets dels k)
           diff (clojure.set/difference add-value del-value)]
-      (if (> (size diff) 0)
+      (if (> (count diff) 0)
         k
         nil)))
 
@@ -130,4 +130,4 @@
           new-dels (clojure.set/union dels (.dels other))]
       (ObservedRemoveSet. new-adds new-dels))))
 
-(defn observed-remove [] (ObservedRemoveSet {} {}))
+(defn observed-remove [] (ObservedRemoveSet. {} {}))
