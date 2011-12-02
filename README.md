@@ -34,7 +34,7 @@ a vector of them like this:
 ```
 
 The data types also implement any appropriate Java Interfaces
-and Clojure Protocols. The difference knockbox set implementations,
+and Clojure Protocols. The different knockbox set implementations,
 for example, can be used just like Clojure Sets.
 
 ## Example Usage
