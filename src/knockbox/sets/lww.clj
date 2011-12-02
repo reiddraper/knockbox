@@ -39,23 +39,23 @@
     (map #(get % 0)
       (filter no-nil no-deletes))))
 
-(deftype LWW [^IPersistentMap adds
+(deftype LWWSet [^IPersistentMap adds
               ^IPersistentMap dels]
 
   IPersistentSet 
   (disjoin [this k]
     (let [now (System/nanoTime)]
-      (LWW. adds
+      (LWWSet. adds
         (assoc dels k now))))
 
   (cons [this k]
     (let [now (System/nanoTime)]
-      (LWW.
+      (LWWSet.
         (assoc adds k now)
         dels)))
 
   (empty [this]
-    (LWW. {} {}))
+    (LWWSet. {} {}))
 
   (equiv [this other]
     (.equals this other))
@@ -76,7 +76,7 @@
     (.meta ^IObj adds))
 
   (withMeta [this m]
-    (LWW. (.withMeta ^IObj adds m)
+    (LWWSet. (.withMeta ^IObj adds m)
           dels))
 
   Object
@@ -124,7 +124,7 @@
   (resolve [this other]
     (let [new-adds (hash-max adds (.adds other))
           new-dels (hash-max dels (.dels other))]
-      (LWW. new-adds new-dels))))
+      (LWWSet. new-adds new-dels))))
 
 
-(defn lww [] (LWW. {} {}))
+(defn lww [] (LWWSet. {} {}))
