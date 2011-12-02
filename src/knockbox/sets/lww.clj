@@ -17,43 +17,56 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(in-ns 'knockbox.set)
+(in-ns 'knockbox.sets)
 
-(defn twop-minus-deletes [adds dels]
-  (clojure.set/difference
-    adds
-    dels))
+(defn- hash-max
+  "Merge two hashes, taking the
+  max value from keys in both hashes"
+  [a b]
+  (let [f (fn [a b] (max a b))]
+    (merge-with f a b)))
 
-(deftype TwoPhaseSet [^IPersistentSet adds
-                      ^IPersistentSet dels]
+(defn- lww-minus-deletes
+  "Remove deletes with
+  earlier timestamps
+  than adds"
+  [adds dels]
+  (let [favor-deletes (fn [add delete] (if (>= delete add) nil add))
+        no-deletes (merge-with favor-deletes
+                        adds
+                        (select-keys dels (keys adds)))
+        no-nil (fn [a] (not= (get a 1) nil))]
+    (map #(get % 0)
+      (filter no-nil no-deletes))))
+
+(deftype LWW [^IPersistentMap adds
+              ^IPersistentMap dels]
 
   IPersistentSet 
   (disjoin [this k]
-    (if (contains? adds k)
-      (TwoPhaseSet. adds (conj dels k))
-      ;; TODO:
-      ;; should this return nil or this?
-      this))
+    (let [now (System/nanoTime)]
+      (LWW. adds
+        (assoc dels k now))))
 
   (cons [this k]
-    (TwoPhaseSet.
-      (conj adds k)
-      dels))
+    (let [now (System/nanoTime)]
+      (LWW.
+        (assoc adds k now)
+        dels)))
 
   (empty [this]
-    (TwoPhaseSet. #{} #{}))
+    (LWW. {} {}))
 
   (equiv [this other]
     (.equals this other))
 
   (get [this k]
-    (if (get dels k)
-      nil
-      (get adds k)))
+    (if (> (get adds k) (get dels k))
+      k
+      nil))
 
   (seq [this]
-    (seq
-      (twop-minus-deletes adds dels)))
+    (seq (lww-minus-deletes adds dels)))
 
   (count [this]
     (count (seq this)))
@@ -63,12 +76,12 @@
     (.meta ^IObj adds))
 
   (withMeta [this m]
-    (TwoPhaseSet. (.withMeta ^IObj adds m)
+    (LWW. (.withMeta ^IObj adds m)
           dels))
 
   Object
   (hashCode [this]
-    (hash (twop-minus-deletes adds dels)))
+    (hash (set (seq this))))
 
   (equals [this other]
     (or (identical? this other)
@@ -78,7 +91,7 @@
                     (every? #(contains? % o) (seq this)))))))
 
   (toString [this]
-    (.toString (twop-minus-deletes adds dels)))
+    (.toString (set (seq this))))
 
   Set
   (contains [this k]
@@ -109,8 +122,9 @@
 
   Resolvable 
   (resolve [this other]
-    (let [new-adds (clojure.set/union adds (.adds other))
-          new-dels (clojure.set/union dels (.dels other))]
-      (TwoPhaseSet. new-adds new-dels))))
+    (let [new-adds (hash-max adds (.adds other))
+          new-dels (hash-max dels (.dels other))]
+      (LWW. new-adds new-dels))))
 
-(defn two-phase [] (TwoPhaseSet. #{} #{}))
+
+(defn lww [] (LWW. {} {}))

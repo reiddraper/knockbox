@@ -40,18 +40,18 @@ for example, can be used just like Clojure Sets.
 ## Example Usage
 
 ```clojure
-(require 'knockbox.set)
+(require 'knockbox.sets)
 
 ;; last-write-wins set
-(def a (knockbox.set/lww))
+(def a (knockbox.sets/lww))
 ;; => #{}
 
 ;; two-phase set
-(def b (knockbox.set/two-phase))
+(def b (knockbox.sets/two-phase))
 ;; => #{}
 
 ;; observed-remove set 
-(def c (knockbox.set/observed-remove))
+(def c (knockbox.sets/observed-remove))
 ;; => #{}
 
 (disj a :foo)

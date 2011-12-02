@@ -1,4 +1,4 @@
-; -------------------------------------------------------------------
+;; -------------------------------------------------------------------
 ;; Copyright (c) 2011 Basho Technologies, Inc.  All Rights Reserved.
 ;;
 ;; This file is provided to you under the Apache License,
@@ -17,54 +17,43 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(in-ns 'knockbox.set)
+(in-ns 'knockbox.sets)
 
-(import java.util.UUID)
+(defn twop-minus-deletes [adds dels]
+  (clojure.set/difference
+    adds
+    dels))
 
-(defn- uuid []
-  (.toString (java.util.UUID/randomUUID)))
-
-(defn- gets
-  "Just like `get` but with #{} as the default
-  notfound value"
-  [coll item]
-  (get coll item #{}))
-
-(deftype ObservedRemoveSet [^IPersistentMap adds
-                            ^IPersistentMap dels]
+(deftype TwoPhaseSet [^IPersistentSet adds
+                      ^IPersistentSet dels]
 
   IPersistentSet 
   (disjoin [this k]
-    (let [new-del-value (clojure.set/union (gets adds) (gets dels))
-          new-adds-set  (dissoc adds k)
-          new-dels-set  (assoc dels k new-del-value)]
-      (ObservedRemoveSet. new-adds-set new-dels-set)))
+    (if (contains? adds k)
+      (TwoPhaseSet. adds (conj dels k))
+      ;; TODO:
+      ;; should this return nil or this?
+      this))
 
   (cons [this k]
-    (let [id (uuid)
-          new-adds-value (clojure.set/union #{id} (gets adds k))]
-      (ObservedRemoveSet. new-adds-value dels)))
+    (TwoPhaseSet.
+      (conj adds k)
+      dels))
 
   (empty [this]
-    (ObservedRemoveSet. {} {}))
+    (TwoPhaseSet. #{} #{}))
 
   (equiv [this other]
     (.equals this other))
 
   (get [this k]
-    (let [add-value (gets adds k)
-          del-value (gets dels k)
-          diff (clojure.set/difference add-value del-value)]
-      (if (> (count diff) 0)
-        k
-        nil)))
+    (if (get dels k)
+      nil
+      (get adds k)))
 
   (seq [this]
-    (let [candidates (keys adds)
-          values (map #(get this %) candidates)
-          no-nil (filter (comp not nil?) values)]
-      (seq no-nil)))
-          
+    (seq
+      (twop-minus-deletes adds dels)))
 
   (count [this]
     (count (seq this)))
@@ -74,15 +63,12 @@
     (.meta ^IObj adds))
 
   (withMeta [this m]
-    (ObservedRemoveSet. (.withMeta ^IObj adds m)
+    (TwoPhaseSet. (.withMeta ^IObj adds m)
           dels))
 
   Object
-  ;; TODO:
-  ;; need to come up with a
-  ;; better hash func than this
   (hashCode [this]
-    (hash (set (seq this))))
+    (hash (twop-minus-deletes adds dels)))
 
   (equals [this other]
     (or (identical? this other)
@@ -92,7 +78,7 @@
                     (every? #(contains? % o) (seq this)))))))
 
   (toString [this]
-    (.toString (seq this)))
+    (.toString (twop-minus-deletes adds dels)))
 
   Set
   (contains [this k]
@@ -123,11 +109,8 @@
 
   Resolvable 
   (resolve [this other]
-    ;; TODO:
-    ;; this is another opportunity to prune
-    ;; the uuids in adds if they are in dels
     (let [new-adds (clojure.set/union adds (.adds other))
           new-dels (clojure.set/union dels (.dels other))]
-      (ObservedRemoveSet. new-adds new-dels))))
+      (TwoPhaseSet. new-adds new-dels))))
 
-(defn observed-remove [] (ObservedRemoveSet. {} {}))
+(defn two-phase [] (TwoPhaseSet. #{} #{}))

@@ -17,7 +17,7 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(ns knockbox.set
+(ns knockbox.sets
   (:require [clojure.set])
   (:import (clojure.lang IPersistentSet IPersistentMap
                          IFn IObj RT)
@@ -26,6 +26,6 @@
   (:refer-clojure :exclude [resolve])
   (:use [knockbox.resolvable]))
 
-(load "lww")
-(load "two_phase")
-(load "or")
+(load "sets/lww")
+(load "sets/two_phase")
+(load "sets/or")

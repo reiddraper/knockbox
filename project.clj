@@ -21,4 +21,4 @@
   :description "An eventual-consistency toolbox for Clojure, and eventually the JVM in general."
   :dependencies [[org.clojure/clojure "1.3.0"]]
   :dev-dependencies [[lein-marginalia "0.6.0"]]
-  :aot [knockbox.set])
+  :aot [knockbox.sets])

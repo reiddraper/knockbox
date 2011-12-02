@@ -1,4 +1,4 @@
-;; -------------------------------------------------------------------
+; -------------------------------------------------------------------
 ;; Copyright (c) 2011 Basho Technologies, Inc.  All Rights Reserved.
 ;;
 ;; This file is provided to you under the Apache License,
@@ -17,56 +17,54 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(in-ns 'knockbox.set)
+(in-ns 'knockbox.sets)
 
-(defn- hash-max
-  "Merge two hashes, taking the
-  max value from keys in both hashes"
-  [a b]
-  (let [f (fn [a b] (max a b))]
-    (merge-with f a b)))
+(import java.util.UUID)
 
-(defn- lww-minus-deletes
-  "Remove deletes with
-  earlier timestamps
-  than adds"
-  [adds dels]
-  (let [favor-deletes (fn [add delete] (if (>= delete add) nil add))
-        no-deletes (merge-with favor-deletes
-                        adds
-                        (select-keys dels (keys adds)))
-        no-nil (fn [a] (not= (get a 1) nil))]
-    (map #(get % 0)
-      (filter no-nil no-deletes))))
+(defn- uuid []
+  (.toString (java.util.UUID/randomUUID)))
 
-(deftype LWW [^IPersistentMap adds
-              ^IPersistentMap dels]
+(defn- gets
+  "Just like `get` but with #{} as the default
+  notfound value"
+  [coll item]
+  (get coll item #{}))
+
+(deftype ObservedRemoveSet [^IPersistentMap adds
+                            ^IPersistentMap dels]
 
   IPersistentSet 
   (disjoin [this k]
-    (let [now (System/nanoTime)]
-      (LWW. adds
-        (assoc dels k now))))
+    (let [new-del-value (clojure.set/union (gets adds) (gets dels))
+          new-adds-set  (dissoc adds k)
+          new-dels-set  (assoc dels k new-del-value)]
+      (ObservedRemoveSet. new-adds-set new-dels-set)))
 
   (cons [this k]
-    (let [now (System/nanoTime)]
-      (LWW.
-        (assoc adds k now)
-        dels)))
+    (let [id (uuid)
+          new-adds-value (clojure.set/union #{id} (gets adds k))]
+      (ObservedRemoveSet. new-adds-value dels)))
 
   (empty [this]
-    (LWW. {} {}))
+    (ObservedRemoveSet. {} {}))
 
   (equiv [this other]
     (.equals this other))
 
   (get [this k]
-    (if (> (get adds k) (get dels k))
-      k
-      nil))
+    (let [add-value (gets adds k)
+          del-value (gets dels k)
+          diff (clojure.set/difference add-value del-value)]
+      (if (> (count diff) 0)
+        k
+        nil)))
 
   (seq [this]
-    (seq (lww-minus-deletes adds dels)))
+    (let [candidates (keys adds)
+          values (map #(get this %) candidates)
+          no-nil (filter (comp not nil?) values)]
+      (seq no-nil)))
+          
 
   (count [this]
     (count (seq this)))
@@ -76,10 +74,13 @@
     (.meta ^IObj adds))
 
   (withMeta [this m]
-    (LWW. (.withMeta ^IObj adds m)
+    (ObservedRemoveSet. (.withMeta ^IObj adds m)
           dels))
 
   Object
+  ;; TODO:
+  ;; need to come up with a
+  ;; better hash func than this
   (hashCode [this]
     (hash (set (seq this))))
 
@@ -91,7 +92,7 @@
                     (every? #(contains? % o) (seq this)))))))
 
   (toString [this]
-    (.toString (set (seq this))))
+    (.toString (seq this)))
 
   Set
   (contains [this k]
@@ -122,9 +123,11 @@
 
   Resolvable 
   (resolve [this other]
-    (let [new-adds (hash-max adds (.adds other))
-          new-dels (hash-max dels (.dels other))]
-      (LWW. new-adds new-dels))))
+    ;; TODO:
+    ;; this is another opportunity to prune
+    ;; the uuids in adds if they are in dels
+    (let [new-adds (clojure.set/union adds (.adds other))
+          new-dels (clojure.set/union dels (.dels other))]
+      (ObservedRemoveSet. new-adds new-dels))))
 
-
-(defn lww [] (LWW. {} {}))
+(defn observed-remove [] (ObservedRemoveSet. {} {}))
