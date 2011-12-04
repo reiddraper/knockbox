@@ -37,7 +37,7 @@ The data types also implement any appropriate Java Interfaces
 and Clojure Protocols. The different knockbox set implementations,
 for example, can be used just like Clojure Sets.
 
-## Example Usage
+## Sets
 
 ```clojure
 (require 'knockbox.sets)
@@ -59,6 +59,29 @@ for example, can be used just like Clojure Sets.
 
 (conj b :bar)
 ;; => #{:bar}
+```
+
+## Registers
+
+Registers are simple containers for values.
+Currently there is one Register implementation with
+last-write-wins semantics.
+
+```clojure
+(require '(knockbox core registers))
+
+;; the only argument to lww is the value
+;; of the register
+(def a (knockbox.registers/lww "1"))
+(def b (knockbox.registers/lww "2"))
+(def c (knockbox.registers/lww "3"))
+
+;; the value can be queried like
+(.value a)
+;; => "1"
+
+(.value (knockbox.core/resolve [c b a]))
+;; => "3"
 ```
 
 ## Documentation
