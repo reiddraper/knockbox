@@ -16,7 +16,7 @@ for automatic conflict-resolution. This project is a collection of these data-ty
 
 knockbox is currently in development and the API will be changing quickly, without notice.
 
-## Implementation
+## Resolution Protocol
 
 Each of the data type in knockbox implement the `knockbox.resolvable/Resolvable`
 protocol, which is currently simply:
