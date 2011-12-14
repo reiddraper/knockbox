@@ -134,5 +134,20 @@
           new-dels (hash-max dels (.dels other))]
       (LWWSet. new-adds new-dels))))
 
-
-(defn lww [] (LWWSet. {} {}))
+(defn lww
+  "Creates a new `LWWSet`. This type
+  uses timestamps to resolve conflicts
+  between set addition/removal. Under the hood,
+  two maps are used to represent addition and removal.
+  The keys in the maps are values in the set,
+  and values are the timestamps. For example,
+  if something is added to the set, an
+  entry into the `adds` map is made mapping
+  from the entry => timestamp. Conflicts
+  are resolved by letting the set with the most
+  recent not-nil timestamp win. This means that
+  if the timetstamp for deleting `:foo` is more
+  recent than adding it, `:foo` won't appear
+  in the set at all"
+  []
+  (LWWSet. {} {}))
