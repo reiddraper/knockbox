@@ -61,9 +61,13 @@
     (.equals this other))
 
   (get [this k]
-    (if (> (get adds k) (get dels k))
-      k
-      nil))
+    (if (get adds k)
+      (if (get dels k)
+        (if (> (get adds k) (get dels k))
+          k
+          nil)
+        k)
+      k))
 
   (seq [this]
     (seq (lww-minus-deletes adds dels)))
@@ -119,6 +123,10 @@
   ;; this is just here to mark
   ;; the object as serializable
   Serializable
+
+  IFn
+  (invoke [this k]
+    (get this k))
 
   Resolvable 
   (resolve [this other]
