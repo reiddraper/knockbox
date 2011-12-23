@@ -12,6 +12,8 @@ This means that you can have two conflicting values for a particular key. Resolv
 is up to application-logic in the database clients. Certain data-types and operations are suited
 for automatic conflict-resolution. This project is a collection of these data-types and operations.
 
+There is also a blog post about knockbox [here](http://reiddraper.com/introducing-knockbox/).
+
 ## Status
 
 knockbox is currently in development and the API will be changing quickly, without notice.
