@@ -17,7 +17,7 @@
 ;;
 ;; -------------------------------------------------------------------
 
-(in-ns 'knockbox.set)
+(in-ns 'knockbox.sets)
 
 (import java.util.UUID)
 
