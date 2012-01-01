@@ -24,13 +24,12 @@
   (:refer-clojure :exclude [resolve])
   (:use [knockbox.resolvable]))
 
-
-(deftype LWWRegister [value timestamp __meta]
+(deftype LWWRegister [value timestamp metad]
   ;; use the `__meta` var to carry
   ;; the metadata information
   IObj
   (meta [this]
-    __meta)
+    metad)
 
   (withMeta [this m]
     (LWWRegister. value timestamp m))
@@ -43,4 +42,4 @@
   
   Serializable)
 
-(defn lww [value] (LWWRegister. value (System/nanoTime)))
+(defn lww [value] (LWWRegister. value (System/nanoTime) {}))
