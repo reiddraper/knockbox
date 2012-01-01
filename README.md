@@ -1,5 +1,9 @@
 # Knockbox
 
+## Build status
+
+[![Build Status](https://secure.travis-ci.org/reiddraper/knockbox.png)](http://travis-ci.org/reiddraper/knockbox)
+
 knockbox is an eventual-consistency toolbox for Clojure,
 and eventually the JVM in general. It's inspired by
 [statebox](https://github.com/mochi/statebox) and
