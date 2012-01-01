@@ -121,6 +121,10 @@
   ;; the object as serializable
   Serializable
 
+  IFn
+  (invoke [this k]
+    (get this k))
+
   Resolvable 
   (resolve [this other]
     ;; TODO:
