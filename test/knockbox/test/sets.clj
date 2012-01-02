@@ -23,7 +23,10 @@
               lww (knockbox.sets/lww)
               two-phase (knockbox.sets/two-phase)]
           (contains? ?set ?item) => ?expected))
-        ?set      ?item   ?expected
-        obs-rem   :foo    false
-        lww       :foo    false
-        two-phase :foo    false)
+        ?set                  ?item   ?expected
+        obs-rem               :foo    false
+        lww                   :foo    false
+        two-phase             :foo    false
+        (conj obs-rem :foo)   :foo    true
+        (conj lww :foo)       :foo    true
+        (conj two-phase :foo) :foo    true)
