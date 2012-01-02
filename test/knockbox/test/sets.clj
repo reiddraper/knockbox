@@ -27,6 +27,18 @@
         obs-rem               :foo    false
         lww                   :foo    false
         two-phase             :foo    false
+
         (conj obs-rem :foo)   :foo    true
         (conj lww :foo)       :foo    true
-        (conj two-phase :foo) :foo    true)
+        (conj two-phase :foo) :foo    true
+
+
+        (-> obs-rem   (conj :foo) (disj :foo))    :foo false
+        (-> lww       (conj :foo) (disj :foo))    :foo false
+        (-> two-phase (conj :foo) (disj :foo))    :foo false
+
+        (-> obs-rem   (conj :foo) (disj :bar))    :foo true
+        (-> lww       (conj :foo) (disj :bar))    :foo true
+        (-> two-phase (conj :foo) (disj :bar))    :foo true)
+
+
