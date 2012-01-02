@@ -64,7 +64,6 @@
           values (map #(get this %) candidates)
           no-nil (filter (comp not nil?) values)]
       (seq no-nil)))
-          
 
   (count [this]
     (count (seq this)))
