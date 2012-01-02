@@ -17,14 +17,13 @@
         f (conj s :foo)]
     (contains? f :foo) => true))
 
-(fact (contains? (conj (knockbox.sets/observed-remove) :foo) :foo) => true)
-
-;(tabular
-;  (fact "sets contain items properly"
-;        (let [obs-rem (knockbox.sets/observed-remove)
-;              lww (knockbox.sets/lww)
-;              two-phase (knockbox.sets/two-phase)]
-;          (contains? ?set ?item) => ?expected))
-;        ?set    ?item   ?expected
-;        lww     :foo    false)
-;
+(tabular
+  (fact "sets contain items properly"
+        (let [obs-rem (knockbox.sets/observed-remove)
+              lww (knockbox.sets/lww)
+              two-phase (knockbox.sets/two-phase)]
+          (contains? ?set ?item) => ?expected))
+        ?set      ?item   ?expected
+        obs-rem   :foo    false
+        lww       :foo    false
+        two-phase :foo    false)
