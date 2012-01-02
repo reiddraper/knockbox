@@ -6,3 +6,8 @@
 (fact
   (let [s (knockbox.sets/observed-remove)]
     (contains? s :foo) => false))
+
+(fact
+  (let [s (knockbox.sets/observed-remove)
+        f (conj s :foo)]
+    (contains? f :foo) => true))
