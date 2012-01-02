@@ -33,20 +33,20 @@
   [adds dels]
   (let [favor-deletes (fn [add delete] (if (>= delete add) nil add))
         no-deletes (merge-with favor-deletes
-                        adds
-                        (select-keys dels (keys adds)))
+                               adds
+                               (select-keys dels (keys adds)))
         no-nil (fn [a] (not= (get a 1) nil))]
     (map #(get % 0)
-      (filter no-nil no-deletes))))
+         (filter no-nil no-deletes))))
 
 (deftype LWWSet [^IPersistentMap adds
-              ^IPersistentMap dels]
+                 ^IPersistentMap dels]
 
   IPersistentSet 
   (disjoin [this k]
     (let [now (System/nanoTime)]
       (LWWSet. adds
-        (assoc dels k now))))
+               (assoc dels k now))))
 
   (cons [this k]
     (let [now (System/nanoTime)]
@@ -67,7 +67,7 @@
           k
           nil)
         k)
-      k))
+      nil))
 
   (seq [this]
     (seq (lww-minus-deletes adds dels)))
@@ -81,7 +81,7 @@
 
   (withMeta [this m]
     (LWWSet. (.withMeta ^IObj adds m)
-          dels))
+             dels))
 
   Object
   (hashCode [this]

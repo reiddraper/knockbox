@@ -35,15 +35,16 @@
 
   IPersistentSet 
   (disjoin [this k]
-    (let [new-del-value (clojure.set/union (gets adds) (gets dels))
-          new-adds-set  (dissoc adds k)
-          new-dels-set  (assoc dels k new-del-value)]
-      (ObservedRemoveSet. new-adds-set new-dels-set)))
+    (let [new-del-value (clojure.set/union (gets adds k) (gets dels k))
+          new-adds-map  (dissoc adds k)
+          new-dels-map  (assoc dels k new-del-value)]
+      (ObservedRemoveSet. new-adds-map new-dels-map)))
 
   (cons [this k]
     (let [id (uuid)
-          new-adds-value (clojure.set/union #{id} (gets adds k))]
-      (ObservedRemoveSet. new-adds-value dels)))
+          new-adds-value (clojure.set/union #{id} (gets adds k))
+          new-adds (assoc adds k new-adds-value)]
+      (ObservedRemoveSet. new-adds dels)))
 
   (empty [this]
     (ObservedRemoveSet. {} {}))
