@@ -19,7 +19,16 @@
 
 (ns knockbox.core
   (:refer-clojure :exclude [resolve])
-  (:require [knockbox.resolvable]))
+  (:require [knockbox.resolvable])
+  (:require (cheshire core custom)))
 
 (defn resolve [coll]
   (reduce knockbox.resolvable/resolve coll)) 
+
+(defmulti from-json
+  (fn [json-string]
+  (let [parsed (cheshire.core/parse-string json-string true)]
+    (:type parsed))))
+
+(defn to-json [obj]
+  (cheshire.custom/encode obj))
