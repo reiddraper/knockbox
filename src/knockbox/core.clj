@@ -27,8 +27,8 @@
 
 (defmulti from-json
   (fn [json-string]
-  (let [parsed (cheshire.core/parse-string json-string true)]
-    (:type parsed))))
+    (let [parsed (cheshire.core/parse-string json-string true)]
+      (:type parsed))))
 
 (defn to-json [obj]
   (cheshire.custom/encode obj))
