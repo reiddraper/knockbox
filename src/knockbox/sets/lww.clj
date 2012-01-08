@@ -145,7 +145,7 @@
           elems (reduce rfn [] (clojure.set/union (keys adds)
                                                   (keys dels)))]
       (.writeRaw jsongen (cheshire.core/generate-string
-                   (assoc m :e elems))))))
+                           (assoc m :e elems))))))
 
 (defn lww
   "Creates a new `LWWSet`. This type
@@ -164,3 +164,18 @@
   in the set at all"
   []
   (LWWSet. {} {}))
+
+(defmethod knockbox.core/handle-json-structure "lww-e-set"
+  [obj]
+  (let [rfn (fn [[a r] [elem a-time & r-time]]
+              [(if a-time (assoc a elem a-time) a)
+               (if (seq r-time) (assoc r elem (first r-time)) r)])
+        [a r] (reduce rfn [{} {}] (:e obj))]
+    (println "adds" a)
+    (println "dels" r)
+    (LWWSet. a r)))
+
+
+
+
+
