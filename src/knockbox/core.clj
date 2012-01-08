@@ -25,10 +25,13 @@
 (defn resolve [coll]
   (reduce knockbox.resolvable/resolve coll)) 
 
-(defmulti from-json
-  (fn [json-string]
-    (let [parsed (cheshire.core/parse-string json-string true)]
-      (:type parsed))))
-
 (defn to-json [obj]
   (cheshire.custom/encode obj))
+
+(defmulti handle-json-structure
+  (fn [obj]
+      (:type obj)))
+
+(defn from-json [json-string]
+  (let [parsed (cheshire.core/parse-string json-string true)]
+    (handle-json-structure parsed)))

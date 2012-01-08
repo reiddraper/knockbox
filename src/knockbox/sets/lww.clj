@@ -131,7 +131,21 @@
   (resolve [this other]
     (let [new-adds (hash-max adds (.adds other))
           new-dels (hash-max dels (.dels other))]
-      (LWWSet. new-adds new-dels))))
+      (LWWSet. new-adds new-dels)))
+
+  cheshire.custom/JSONable
+  (to-json [this jsongen]
+    (let [m {:type "lww-e-set"}
+          rfn (fn [acc elem]
+                (let [a (clojure.core/get adds elem)
+                      d (clojure.core/get dels elem)
+                      ea [elem a]
+                      vect (if d (conj ea d) ea)]
+                  (conj acc vect)))
+          elems (reduce rfn [] (clojure.set/union (keys adds)
+                                                  (keys dels)))]
+      (.writeRaw jsongen (cheshire.core/generate-string
+                   (assoc m :e elems))))))
 
 (defn lww
   "Creates a new `LWWSet`. This type

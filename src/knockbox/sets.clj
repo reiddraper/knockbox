@@ -19,6 +19,7 @@
 
 (ns knockbox.sets
   (:require [clojure.set])
+  (:require [cheshire.custom])
   (:import (clojure.lang IPersistentSet IPersistentMap
                          IFn IObj RT)
            (java.util Set)
