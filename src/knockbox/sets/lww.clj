@@ -19,12 +19,11 @@
 
 (in-ns 'knockbox.sets)
 
-(defn- hash-max
+(defn hash-max
   "Merge two hashes, taking the
   max value from keys in both hashes"
   [a b]
-  (let [f (fn [a b] (max a b))]
-    (merge-with f a b)))
+  (merge-with max a b))
 
 (defn- lww-minus-deletes
   "Remove deletes with
