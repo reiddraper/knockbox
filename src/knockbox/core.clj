@@ -29,6 +29,11 @@
   (cheshire.custom/encode obj))
 
 (defmulti handle-json-structure
+  "Return an object from
+  a parsed json representation
+  of an object. Useful when the json
+  representation of an object is different
+  from the internal representation"
   (fn [obj]
       (:type obj)))
 
