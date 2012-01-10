@@ -91,7 +91,7 @@
         (and (instance? Set other)
              (let [^Set o (cast Set other)]
                (and (= (count this) (count o))
-                    (every? #(contains? % o) (seq this)))))))
+                    (every? #(contains? o %) (seq this)))))))
 
   (toString [this]
     (.toString (set (seq this))))
@@ -166,10 +166,14 @@
   (LWWSet. {} {}))
 
 (defmethod knockbox.core/handle-json-structure "lww-e-set"
+  ;TODO
+  ;need to figure out
+  ;how to deal with
+  ;strings vs. keywords
   [obj]
   (let [rfn (fn [[a r] [elem a-time & r-time]]
-              [(if a-time (assoc a elem a-time) a)
-               (if (seq r-time) (assoc r elem (first r-time)) r)])
+              [(if a-time (assoc a (name elem) a-time) a)
+               (if (seq r-time) (assoc r (name elem) (first r-time)) r)])
         [a r] (reduce rfn [{} {}] (:e obj))]
     (println "adds" a)
     (println "dels" r)
