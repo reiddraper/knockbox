@@ -90,7 +90,7 @@
         (and (instance? Set other)
              (let [^Set o (cast Set other)]
                (and (= (count this) (count o))
-                    (every? #(contains? % o) (seq this)))))))
+                    (every? #(contains? o %) (seq this)))))))
 
   (toString [this]
     (.toString (seq this)))
