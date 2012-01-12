@@ -111,6 +111,10 @@
   (invoke [this k]
     (get this k))
 
+  java.lang.Iterable
+  (iterator [this]
+    (clojure.lang.SeqIterator. (seq this)))
+
   Resolvable 
   (resolve [this other]
     (let [new-adds (clojure.set/union adds (.adds other))

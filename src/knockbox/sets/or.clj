@@ -126,6 +126,10 @@
   (invoke [this k]
     (get this k))
 
+  java.lang.Iterable
+  (iterator [this]
+    (clojure.lang.SeqIterator. (seq this)))
+
   Resolvable 
   (resolve [this other]
     ;; TODO:
