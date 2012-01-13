@@ -34,8 +34,7 @@
   of an object. Useful when the json
   representation of an object is different
   from the internal representation"
-  (fn [obj]
-      (:type obj)))
+  :type)
 
 (defn from-json [json-string]
   (let [parsed (cheshire.core/parse-string json-string true)]
