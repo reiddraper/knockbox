@@ -180,8 +180,6 @@
               [(if a-time (assoc a (name elem) a-time) a)
                (if (seq r-time) (assoc r (name elem) (first r-time)) r)])
         [a r] (reduce rfn [{} {}] (:e obj))]
-    (println "adds" a)
-    (println "dels" r)
     (LWWSet. a r)))
 
 

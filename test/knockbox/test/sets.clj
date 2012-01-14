@@ -33,7 +33,7 @@
         (let [obs-rem   (knockbox.sets/observed-remove)
               lww       (knockbox.sets/lww)
               two-phase (knockbox.sets/two-phase)
-              
+
               obr-a (into obs-rem #{:foo :bar :baz})
               lww-a (into lww #{:foo :bar :baz})
               tp-a  (into two-phase #{:foo :bar :baz})
@@ -55,17 +55,38 @@
 (tabular
   (fact "an encode-decode json cycle is the same
         as the original"
-        (let [lww (knockbox.sets/lww)
+        (let [obs-rem   (knockbox.sets/observed-remove)
+              lww       (knockbox.sets/lww)
+              two-phase (knockbox.sets/two-phase)
+
               lww-a (into lww #{:foo :bar :baz})
               lww-b (disj lww-a :foo)
-              lww-c (disj lww :foo)]
-          ;(kbc/from-json (kbc/to-json ?set)) => ?set))
+              lww-c (disj lww :foo)
+
+              obs-rem-a (into obs-rem #{:foo :bar :baz})
+              obs-rem-b (disj obs-rem-a :foo)
+              obs-rem-c (disj obs-rem :foo)
+
+              two-phase-a (into two-phase #{:foo :bar :baz})
+              two-phase-b (disj two-phase-a :foo)
+              two-phase-c (disj two-phase :foo)]
+
           ?set => ?set))
           ?set
           lww
           lww-a
           lww-b
-          lww-c)
+          lww-c
+
+          obs-rem
+          obs-rem-a
+          obs-rem-b
+          obs-rem-c)
+
+;          two-phase
+;          two-phase-a
+;          two-phase-b
+;          two-phase-c)
 
 (tabular
   (fact "sets equal themselves"
