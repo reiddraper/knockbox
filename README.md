@@ -90,6 +90,26 @@ last-write-wins semantics.
 ;; => "3"
 ```
 
+## Serialization
+
+knockbox currently supports JSON serialization for the three
+set types. Usage below:
+
+```clojure
+(require '(knockbox sets core))
+
+(def a (knockbox.sets/lww))
+
+(def b (conj a :foo :bar :baz))
+
+(def j (knockbox.core/to-json b))
+
+(def c (knockbox.core/from-json j))
+
+(= b c)
+;; => true
+```
+
 ## Tests
 
 Tests can be run by typing:
