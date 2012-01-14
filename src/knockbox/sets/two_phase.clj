@@ -138,6 +138,6 @@
   ;how to deal with
   ;strings vs. keywords
   [obj]
-  (let [a (set (:a obj))
-        r (set (:r obj))]
+  (let [a (set (map keyword (:a obj)))
+        r (set (map keyword (:r obj)))]
     (TwoPhaseSet. a r)))

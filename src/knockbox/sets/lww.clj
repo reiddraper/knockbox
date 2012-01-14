@@ -177,8 +177,8 @@
   ;strings vs. keywords
   [obj]
   (let [rfn (fn [[a r] [elem a-time & r-time]]
-              [(if a-time (assoc a (name elem) a-time) a)
-               (if (seq r-time) (assoc r (name elem) (first r-time)) r)])
+              [(if a-time (assoc a (keyword elem) a-time) a)
+               (if (seq r-time) (assoc r (keyword elem) (first r-time)) r)])
         [a r] (reduce rfn [{} {}] (:e obj))]
     (LWWSet. a r)))
 

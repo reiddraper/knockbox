@@ -162,7 +162,7 @@
   ;strings vs. keywords
   [obj]
   (let [rfn (fn [[a r] [elem a-ids & r-ids]]
-              [(if a-ids (assoc a (name elem) (set a-ids)) a)
-               (if (seq r-ids) (assoc r (name elem) (set (first r-ids))) r)])
+              [(if a-ids (assoc a (keyword elem) (set a-ids)) a)
+               (if (seq r-ids) (assoc r (keyword elem) (set (first r-ids))) r)])
         [a r] (reduce rfn [{} {}] (:e obj))]
     (ObservedRemoveSet. a r)))
