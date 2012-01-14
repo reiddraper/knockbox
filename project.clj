@@ -19,6 +19,7 @@
 
 (defproject knockbox "0.0.1-SNAPSHOT"
   :description "An eventual-consistency toolbox for Clojure, and eventually the JVM in general."
-  :dependencies [[org.clojure/clojure "1.3.0"]]
+  :dependencies [[org.clojure/clojure "1.3.0"]
+                 [cheshire "2.0.4"]]
   :dev-dependencies [[midje "1.3.1"  :exclusions [org.clojure/clojure]]
                      [lein-midje "1.0.7"]])

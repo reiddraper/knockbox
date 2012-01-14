@@ -90,7 +90,7 @@
         (and (instance? Set other)
              (let [^Set o (cast Set other)]
                (and (= (count this) (count o))
-                    (every? #(contains? % o) (seq this)))))))
+                    (every? #(contains? o %) (seq this)))))))
 
   (toString [this]
     (.toString (seq this)))
@@ -126,6 +126,10 @@
   (invoke [this k]
     (get this k))
 
+  java.lang.Iterable
+  (iterator [this]
+    (clojure.lang.SeqIterator. (seq this)))
+
   Resolvable 
   (resolve [this other]
     ;; TODO:
@@ -133,6 +137,32 @@
     ;; the uuids in adds if they are in dels
     (let [new-adds (clojure.set/union adds (.adds other))
           new-dels (clojure.set/union dels (.dels other))]
-      (ObservedRemoveSet. new-adds new-dels))))
+      (ObservedRemoveSet. new-adds new-dels)))
+
+  cheshire.custom/JSONable
+  (to-json [this jsongen]
+    (let [m {:type "or-set"}
+          rfn (fn [acc elem]
+                (let [a (vec (clojure.core/get adds elem))
+                      d (vec (clojure.core/get dels elem))
+                      ea [elem a]
+                      vect (if d (conj ea d) ea)]
+                  (conj acc vect)))
+          elems (reduce rfn [] (clojure.set/union (keys adds)
+                                                  (keys dels)))]
+      (.writeRaw jsongen (cheshire.core/generate-string
+                           (assoc m :e elems))))))
 
 (defn observed-remove [] (ObservedRemoveSet. {} {}))
+
+(defmethod knockbox.core/handle-json-structure "or-set"
+  ;TODO
+  ;need to figure out
+  ;how to deal with
+  ;strings vs. keywords
+  [obj]
+  (let [rfn (fn [[a r] [elem a-ids & r-ids]]
+              [(if a-ids (assoc a (name elem) (set a-ids)) a)
+               (if (seq r-ids) (assoc r (name elem) (set (first r-ids))) r)])
+        [a r] (reduce rfn [{} {}] (:e obj))]
+    (ObservedRemoveSet. a r)))

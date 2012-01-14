@@ -75,7 +75,7 @@
         (and (instance? Set other)
              (let [^Set o (cast Set other)]
                (and (= (count this) (count o))
-                    (every? #(contains? % o) (seq this)))))))
+                    (every? #(contains? o %) (seq this)))))))
 
   (toString [this]
     (.toString (twop-minus-deletes adds dels)))
@@ -111,10 +111,33 @@
   (invoke [this k]
     (get this k))
 
+  java.lang.Iterable
+  (iterator [this]
+    (clojure.lang.SeqIterator. (seq this)))
+
   Resolvable 
   (resolve [this other]
     (let [new-adds (clojure.set/union adds (.adds other))
           new-dels (clojure.set/union dels (.dels other))]
-      (TwoPhaseSet. new-adds new-dels))))
+      (TwoPhaseSet. new-adds new-dels)))
+
+  cheshire.custom/JSONable
+  (to-json [this jsongen]
+    (let [m {:type "2p-set"}
+          a (vec adds)
+          r (vec dels)
+          m (-> m (assoc :a a) (assoc :r r))]
+      (.writeRaw jsongen (cheshire.core/generate-string
+                           m)))))
 
 (defn two-phase [] (TwoPhaseSet. #{} #{}))
+
+(defmethod knockbox.core/handle-json-structure "2p-set"
+  ;TODO
+  ;need to figure out
+  ;how to deal with
+  ;strings vs. keywords
+  [obj]
+  (let [a (set (:a obj))
+        r (set (:r obj))]
+    (TwoPhaseSet. a r)))

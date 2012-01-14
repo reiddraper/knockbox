@@ -19,7 +19,23 @@
 
 (ns knockbox.core
   (:refer-clojure :exclude [resolve])
-  (:require [knockbox.resolvable]))
+  (:require [knockbox.resolvable])
+  (:require (cheshire core custom)))
 
 (defn resolve [coll]
   (reduce knockbox.resolvable/resolve coll)) 
+
+(defn to-json [obj]
+  (cheshire.custom/encode obj))
+
+(defmulti handle-json-structure
+  "Return an object from
+  a parsed json representation
+  of an object. Useful when the json
+  representation of an object is different
+  from the internal representation"
+  :type)
+
+(defn from-json [json-string]
+  (let [parsed (cheshire.core/parse-string json-string true)]
+    (handle-json-structure parsed)))

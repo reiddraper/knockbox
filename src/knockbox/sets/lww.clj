@@ -41,23 +41,11 @@
 (deftype LWWSet [^IPersistentMap adds
                  ^IPersistentMap dels]
 
-  IPersistentSet 
+  IPersistentSet
   (disjoin [this k]
     (let [now (System/nanoTime)]
       (LWWSet. adds
                (assoc dels k now))))
-
-  (cons [this k]
-    (let [now (System/nanoTime)]
-      (LWWSet.
-        (assoc adds k now)
-        dels)))
-
-  (empty [this]
-    (LWWSet. {} {}))
-
-  (equiv [this other]
-    (.equals this other))
 
   (get [this k]
     (if (get adds k)
@@ -73,6 +61,19 @@
 
   (count [this]
     (count (seq this)))
+
+  clojure.lang.IPersistentCollection
+  (cons [this k]
+    (let [now (System/nanoTime)]
+      (LWWSet.
+        (assoc adds k now)
+        dels)))
+
+  (empty [this]
+    (LWWSet. {} {}))
+
+  (equiv [this other]
+    (.equals this other))
 
   IObj
   (meta [this]
@@ -91,7 +92,7 @@
         (and (instance? Set other)
              (let [^Set o (cast Set other)]
                (and (= (count this) (count o))
-                    (every? #(contains? % o) (seq this)))))))
+                    (every? #(contains? o %) (seq this)))))))
 
   (toString [this]
     (.toString (set (seq this))))
@@ -127,11 +128,29 @@
   (invoke [this k]
     (get this k))
 
+  java.lang.Iterable
+  (iterator [this]
+    (clojure.lang.SeqIterator. (seq this)))
+
   Resolvable 
   (resolve [this other]
     (let [new-adds (hash-max adds (.adds other))
           new-dels (hash-max dels (.dels other))]
-      (LWWSet. new-adds new-dels))))
+      (LWWSet. new-adds new-dels)))
+
+  cheshire.custom/JSONable
+  (to-json [this jsongen]
+    (let [m {:type "lww-e-set"}
+          rfn (fn [acc elem]
+                (let [a (clojure.core/get adds elem)
+                      d (clojure.core/get dels elem)
+                      ea [elem a]
+                      vect (if d (conj ea d) ea)]
+                  (conj acc vect)))
+          elems (reduce rfn [] (clojure.set/union (keys adds)
+                                                  (keys dels)))]
+      (.writeRaw jsongen (cheshire.core/generate-string
+                           (assoc m :e elems))))))
 
 (defn lww
   "Creates a new `LWWSet`. This type
@@ -150,3 +169,20 @@
   in the set at all"
   []
   (LWWSet. {} {}))
+
+(defmethod knockbox.core/handle-json-structure "lww-e-set"
+  ;TODO
+  ;need to figure out
+  ;how to deal with
+  ;strings vs. keywords
+  [obj]
+  (let [rfn (fn [[a r] [elem a-time & r-time]]
+              [(if a-time (assoc a (name elem) a-time) a)
+               (if (seq r-time) (assoc r (name elem) (first r-time)) r)])
+        [a r] (reduce rfn [{} {}] (:e obj))]
+    (LWWSet. a r)))
+
+
+
+
+
