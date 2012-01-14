@@ -81,12 +81,12 @@
           obs-rem
           obs-rem-a
           obs-rem-b
-          obs-rem-c)
+          obs-rem-c
 
-;          two-phase
-;          two-phase-a
-;          two-phase-b
-;          two-phase-c)
+          two-phase
+          two-phase-a
+          two-phase-b
+          two-phase-c)
 
 (tabular
   (fact "sets equal themselves"
