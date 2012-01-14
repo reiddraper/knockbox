@@ -41,23 +41,11 @@
 (deftype LWWSet [^IPersistentMap adds
                  ^IPersistentMap dels]
 
-  IPersistentSet 
+  IPersistentSet
   (disjoin [this k]
     (let [now (System/nanoTime)]
       (LWWSet. adds
                (assoc dels k now))))
-
-  (cons [this k]
-    (let [now (System/nanoTime)]
-      (LWWSet.
-        (assoc adds k now)
-        dels)))
-
-  (empty [this]
-    (LWWSet. {} {}))
-
-  (equiv [this other]
-    (.equals this other))
 
   (get [this k]
     (if (get adds k)
@@ -73,6 +61,19 @@
 
   (count [this]
     (count (seq this)))
+
+  clojure.lang.IPersistentCollection
+  (cons [this k]
+    (let [now (System/nanoTime)]
+      (LWWSet.
+        (assoc adds k now)
+        dels)))
+
+  (empty [this]
+    (LWWSet. {} {}))
+
+  (equiv [this other]
+    (.equals this other))
 
   IObj
   (meta [this]
@@ -130,7 +131,6 @@
   java.lang.Iterable
   (iterator [this]
     (clojure.lang.SeqIterator. (seq this)))
-
 
   Resolvable 
   (resolve [this other]
