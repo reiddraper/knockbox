@@ -52,3 +52,6 @@
   Serializable)
 
 (defn lww [] (LWWMap. {} {}))
+
+(defmethod print-dup knockbox.maps.LWWMap [o w]
+  (.write w (str "#=(" (.getName ^Class (class o)) ". " (.storage o) " " (.metad o) ")")))

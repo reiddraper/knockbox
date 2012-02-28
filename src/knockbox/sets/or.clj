@@ -166,3 +166,6 @@
                (if (seq r-ids) (assoc r (keyword elem) (set (first r-ids))) r)])
         [a r] (reduce rfn [{} {}] (:e obj))]
     (ObservedRemoveSet. a r)))
+
+(defmethod print-dup knockbox.sets.ObservedRemoveSet [o w]
+  (.write w (str "#=(" (.getName ^Class (class o)) ". " (.adds o) " " (.dels o) ")")))

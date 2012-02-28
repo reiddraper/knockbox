@@ -182,7 +182,5 @@
         [a r] (reduce rfn [{} {}] (:e obj))]
     (LWWSet. a r)))
 
-
-
-
-
+(defmethod print-dup knockbox.sets.LWWSet [o w]
+  (.write w (str "#=(" (.getName ^Class (class o)) ". " (.adds o) " " (.dels o) ")")))

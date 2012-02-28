@@ -43,3 +43,6 @@
   Serializable)
 
 (defn lww [value] (LWWRegister. value (System/nanoTime) {}))
+
+(defmethod print-dup knockbox.registers.LWWRegister [o w]
+  (.write w (str "#=(" (.getName ^Class (class o)) ". " (.value o) " " (.timestamp o) " " (.metad o) ")")))

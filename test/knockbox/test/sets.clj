@@ -53,7 +53,7 @@
         (kbc/resolve [tp-b tp-a])   :foo            false)
 
 (tabular
-  (fact "an encode-decode json cycle is the same
+  (fact "an encode-decode json/clojure-reader cycle is the same
         as the original"
         (let [obs-rem   (knockbox.sets/observed-remove)
               lww       (knockbox.sets/lww)
@@ -71,7 +71,8 @@
               two-phase-b (disj two-phase-a :foo)
               two-phase-c (disj two-phase :foo)]
 
-          (knockbox.core/from-json (knockbox.core/to-json ?set)) => ?set))
+          (knockbox.core/from-json (knockbox.core/to-json ?set)) => ?set
+          (read-string (binding [*print-dup* true] (pr-str ?set))) => ?set))
           ?set
           lww
           lww-a
