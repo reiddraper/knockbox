@@ -141,3 +141,6 @@
   (let [a (set (map keyword (:a obj)))
         r (set (map keyword (:r obj)))]
     (TwoPhaseSet. a r)))
+
+(defmethod print-dup knockbox.sets.TwoPhaseSet [o w]
+  (.write w (str "#=(" (.getName ^Class (class o)) ". " (.adds o) " " (.dels o) ")")))

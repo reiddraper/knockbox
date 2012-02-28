@@ -71,7 +71,8 @@
               two-phase-b (disj two-phase-a :foo)
               two-phase-c (disj two-phase :foo)]
 
-          (knockbox.core/from-json (knockbox.core/to-json ?set)) => ?set))
+          (knockbox.core/from-json (knockbox.core/to-json ?set)) => ?set
+          (read-string (binding [*print-dup* true] (pr-str ?set))) => ?set))
           ?set
           lww
           lww-a
