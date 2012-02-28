@@ -53,7 +53,7 @@
         (kbc/resolve [tp-b tp-a])   :foo            false)
 
 (tabular
-  (fact "an encode-decode json cycle is the same
+  (fact "an encode-decode json/clojure-reader cycle is the same
         as the original"
         (let [obs-rem   (knockbox.sets/observed-remove)
               lww       (knockbox.sets/lww)
