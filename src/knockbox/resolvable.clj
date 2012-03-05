@@ -23,4 +23,5 @@
 (defprotocol Resolvable
     "Represents a type that can be treated
     as a CRDT (commutative replicated data type)."
-    (resolve [a b]))
+    (resolve [a b])
+    (gc [a]))
