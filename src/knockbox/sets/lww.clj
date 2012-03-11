@@ -138,6 +138,9 @@
           new-dels (hash-max dels (.dels other))]
       (LWWSet. new-adds new-dels)))
 
+  (gc [this gc-max-seconds gc-max-items]
+    this)
+
   cheshire.custom/JSONable
   (to-json [this jsongen]
     (let [m {:type "lww-e-set"}

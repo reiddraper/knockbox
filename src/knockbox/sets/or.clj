@@ -18,11 +18,8 @@
 ;; -------------------------------------------------------------------
 
 (in-ns 'knockbox.sets)
+(require '[knockbox.internal :as i])
 
-(import java.util.UUID)
-
-(defn- uuid []
-  (.toString (java.util.UUID/randomUUID)))
 
 (defn- gets
   "Just like `get` but with #{} as the default
@@ -41,7 +38,7 @@
       (ObservedRemoveSet. new-adds-map new-dels-map)))
 
   (cons [this k]
-    (let [id (uuid)
+    (let [id (i/sorted-unique-id!)
           new-adds-value (clojure.set/union #{id} (gets adds k))
           new-adds (assoc adds k new-adds-value)]
       (ObservedRemoveSet. new-adds dels)))
@@ -130,7 +127,7 @@
   (iterator [this]
     (clojure.lang.SeqIterator. (seq this)))
 
-  Resolvable 
+  Resolvable
   (resolve [this other]
     ;; TODO:
     ;; this is another opportunity to prune
@@ -138,6 +135,9 @@
     (let [new-adds (clojure.set/union adds (.adds other))
           new-dels (clojure.set/union dels (.dels other))]
       (ObservedRemoveSet. new-adds new-dels)))
+
+  (gc [this gc-max-seconds gc-max-items]
+    this)
 
   cheshire.custom/JSONable
   (to-json [this jsongen]
