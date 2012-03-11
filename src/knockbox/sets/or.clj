@@ -18,11 +18,8 @@
 ;; -------------------------------------------------------------------
 
 (in-ns 'knockbox.sets)
+(require '[knockbox.internal :as i])
 
-(import java.util.UUID)
-
-(defn- uuid []
-  (.toString (java.util.UUID/randomUUID)))
 
 (defn- gets
   "Just like `get` but with #{} as the default
@@ -41,7 +38,7 @@
       (ObservedRemoveSet. new-adds-map new-dels-map)))
 
   (cons [this k]
-    (let [id (uuid)
+    (let [id (i/uuid)
           new-adds-value (clojure.set/union #{id} (gets adds k))
           new-adds (assoc adds k new-adds-value)]
       (ObservedRemoveSet. new-adds dels)))

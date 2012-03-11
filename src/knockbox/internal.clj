@@ -18,11 +18,9 @@
 ;; -------------------------------------------------------------------
 
 (ns knockbox.internal
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string])
+  (:import java.util.UUID))
 
-(defn- before-at [s]
-  (Long/parseLong (nth (string/split s #"@") 0)))
+(defn uuid []
+  (.toString (java.util.UUID/randomUUID)))
 
-(defn pid []
-  (before-at
-    (.getName  (java.lang.management.ManagementFactory/getRuntimeMXBean))))
