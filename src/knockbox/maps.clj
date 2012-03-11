@@ -32,6 +32,13 @@
   (meta [this]
     metad)
 
+  clojure.lang.IFn
+  (invoke [this k]
+    (get this k))
+
+  ;;java.util.Map
+  ;;TODO ^^
+
   (withMeta [this m]
     (LWWMap. storage m))
 
