@@ -24,4 +24,13 @@
     "Represents a type that can be treated
     as a CRDT (commutative replicated data type)."
     (resolve [a b])
-    (gc [a]))
+    (gc [this gc-max-seconds gc-max-items]
+        "Return a garbage-collected version of
+        `this`. `gc-max-seconds` is the max time
+        in seconds that garbage will be kept.
+        `gc-max-items` is the number of garbage
+        items that will be retained. Items are
+        collected if they meet _either_ of these
+        criteria. `nil` can be used for either
+        parameter, meaning 'infinite', or
+        'forever'"))
