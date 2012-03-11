@@ -121,6 +121,9 @@
           new-dels (clojure.set/union dels (.dels other))]
       (TwoPhaseSet. new-adds new-dels)))
 
+  (gc [this gc-max-seconds gc-max-items]
+    this)
+
   cheshire.custom/JSONable
   (to-json [this jsongen]
     (let [m {:type "2p-set"}

@@ -1,5 +1,6 @@
 (ns knockbox.test.sets
   (:require knockbox.sets)
+  (:require [knockbox.resolvable :as resolvable])
   (:require [knockbox.core :as kbc])
   (:use midje.sweet)
   (:use clojure.test))
@@ -103,6 +104,31 @@
           lww-b (disj lww :foo)
           tp-b  (disj tp-a :foo)]
       ?set => ?set))
+      ?set
+      obs-rem
+      lww
+      two-phase
+      obr-a
+      lww-a
+      tp-a
+      obr-b
+      lww-b
+      tp-b)
+
+(tabular
+  (fact "GC with infinite memory equals no GC"
+    (let [obs-rem   (knockbox.sets/observed-remove)
+          lww       (knockbox.sets/lww)
+          two-phase (knockbox.sets/two-phase)
+
+          obr-a (into obs-rem #{:foo :bar :baz})
+          lww-a (into lww #{:foo :bar :baz})
+          tp-a  (into two-phase #{:foo :bar :baz})
+
+          obr-b (disj obr-a :foo)
+          lww-b (disj lww :foo)
+          tp-b  (disj tp-a :foo)]
+      (resolvable/gc ?set nil nil) => ?set))
       ?set
       obs-rem
       lww
