@@ -90,6 +90,20 @@ last-write-wins semantics.
 ;; => "3"
 ```
 
+## Maps
+
+Maps are currently a work in progress, and don't
+yet implement all of the necessary Java intefaces.
+
+## Counters
+
+Counters with an unbounded number of actors
+(ie. each of your JVM's + Pids) are a tough
+garbage collection problem. I haven't yet
+figured out a way to deal with this. Finding
+a way to bound the number of actors, and not
+doing GC may be another option.
+
 ## Serialization
 
 knockbox currently supports JSON serialization for the three
