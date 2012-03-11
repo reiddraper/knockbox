@@ -38,7 +38,7 @@
       (ObservedRemoveSet. new-adds-map new-dels-map)))
 
   (cons [this k]
-    (let [id (i/uuid)
+    (let [id (i/sorted-unique-id!)
           new-adds-value (clojure.set/union #{id} (gets adds k))
           new-adds (assoc adds k new-adds-value)]
       (ObservedRemoveSet. new-adds dels)))

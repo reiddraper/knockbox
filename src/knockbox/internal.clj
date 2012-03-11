@@ -21,6 +21,26 @@
   (:require [clojure.string :as string])
   (:import java.util.UUID))
 
-(defn uuid []
-  (.toString (java.util.UUID/randomUUID)))
+(def ^:private counter (atom 0N))
+(def ^:private uuid (.toString (java.util.UUID/randomUUID)))
+
+(defn next-count! []
+  (swap! counter inc))
+
+
+(defn- time-since-epoch! []
+  (.getTime (java.util.Date.)))
+
+(defn sorted-unique-id! []
+  "Return unique ids that are roughly sorted
+  by time. In the case that two ids are generated
+  at the same time across JVMs, they unique because
+  of the UUID. In the case two ids are generated
+  at the same time on the same machine, there is
+  also a counter
+  Example:
+  [1331496905454 \"327c4f9a-d3c8-453e-b332-8e04d1db0a2e\" 7N]"
+  [(time-since-epoch!)
+   uuid
+   (next-count!)])
 
